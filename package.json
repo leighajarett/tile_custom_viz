@@ -7,13 +7,15 @@
     "start": "webpack-dev-server --hot --disable-host-check --https"
   },
   "dependencies": {
-    "@looker/components": "^0.7.29",
+    "@looker/components": "^0.8.6",
+    "css-loader": "^3.5.3",
     "lodash": "^4.17.15",
     "react": "^16.13.1",
     "react-beautiful-dnd": "^13.0.0",
     "react-dom": "^16.13.1",
     "react-is": "^16.13.1",
-    "styled-components": "^5.1.0"
+    "style-loader": "^1.2.1",
+    "styled-components": "^5.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.9.6",

@@ -1,4 +1,3 @@
-
 const path = require('path');
 
 module.exports = {
@@ -23,7 +22,15 @@ module.exports = {
         use: {
           loader: "babel-loader"
         }
+      },
+      {
+        test: /\.css$/i,
+        use: [
+          'style-loader',
+          'css-loader'
+        ]
       }
     ]
   }
 };
+
