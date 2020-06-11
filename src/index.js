@@ -1,16 +1,69 @@
-import UseCase from './useCase'
-import React from 'react'
+import Tile from './Tile'
+import React, { useContext } from 'react'
 import ReactDOM from 'react-dom'
-import { Box, Heading } from '@looker/components';
+import { Box } from '@looker/components';
 
 looker.plugins.visualizations.add({
-  // Id and Label are legacy properties that no longer have any function besides documenting
-  // what the visualization used to have. The properties are now set via the manifest
-  // form within the admin/visualizations page of Looker
   options: {
+    color_list: {
+      type: "object_list",
+      label: 'Tile Color',
+      section: 'Colors',
+      newItem: {
+        color: '#F0000D',
+        value: '',
+        show_label: true
+      },
+      options: {
+        value: {
+          label: 'Value',
+          type: 'string',
+          default: '',
+          placeholder: 'A value in the first column, to change the top color of the tiles',
+        },
+        color: {
+          type: 'string',
+          display: 'color',
+          label: 'Color'
+        }
+      }
+    },
+    button_list: {
+      type: "object_list",
+      label: 'Button',
+      section: 'Buttons',
+      newItem: {
+        value: '',
+        icon: 'Public'
+      },
+      options: {
+        value: {
+          label: 'Button Name',
+          type: 'string',
+          default: '',
+          placeholder: 'The display name for the buttons'
+        },
+        icon: {
+          label: 'Icon Name',
+          type: 'string',
+          default: 'Public',
+          placeholder: 'The name of icon for the button, from Looker Components',
+          display: 'select',
+          values: [{'Dashboard': 'Dashboard'},
+          {'Public': 'Public'},
+          {'Account': 'Account'},
+          {'ChartBar': 'ChartBar'},
+          {'Code': 'Code'},
+          {'GitBranch': 'GitBranch'},
+          {'Notes': 'Notes'}
+        ],
+          order: 1
+        }
+      }
+    }
   },
 
-  // Set up the initial state of the visualization
+  // Set up the initial state of the visualizationval[props.vertical_col].value
   create: function(element, config) {
 
     element.innerHTML = `
@@ -44,18 +97,28 @@ looker.plugins.visualizations.add({
       return;
     }
 
-    const offset_props = {
-      height: this._vis_element.offsetHeight, 
-      width: this._vis_element.offsetWidth
+
+    if (config.button_list){
+      if(config.button_list.length > queryResponse.fields.dimensions.length - 3){
+        this.addError({title: "Not Enough Fields", message: "You have more buttons than button fields - remove a button or add another dimension"});
+        return
+      }
+      else {
+        var buttons = config.button_list.map(function(button, i) {
+          return {'column': queryResponse.fields.dimensions[3+i].name, 'name':  button.value, 'icon': button.icon};
+        });
+      }
     }
 
     // update the state with our new data
     this.chart = ReactDOM.render(
-      <Verticals 
-        data={data} 
-        vertical_col={queryResponse.fields.dimensions[0].name}
-        usecase_col={queryResponse.fields.dimensions[1].name}
-        description_col={queryResponse.fields.dimensions[2].name}
+        <TileGroup
+          data={data} 
+          tag_col={queryResponse.fields.dimensions[0].name}
+          name_col={queryResponse.fields.dimensions.length>1 ? queryResponse.fields.dimensions[1].name : null}
+          description_col={queryResponse.fields.dimensions.length>2 ? queryResponse.fields.dimensions[2].name : null}
+          buttons = {buttons ? buttons : null}
+          colorList={config.color_list}
          />,
       this._vis_element
     );
@@ -64,64 +127,27 @@ looker.plugins.visualizations.add({
   }
 });
 
-export function Verticals(props) {
-  const distinct = (value, index, self) => { return self.indexOf(value) === index };
 
-  var verticals = props.data.map(function(item) {
-    return item[props.vertical_col].value;
-  });
-
-  var unique_verticals = verticals.filter(distinct);
-  
+export function TileGroup(props) {
   return (
-    <Box m='large' display='flex' flexWrap='wrap'>
-      {
-          unique_verticals.map((val, i) => 
-            (<Vertical 
-                key={i}
-                vertical={val}
-                data={props.data.filter(function (el) {
-                  return el[props.vertical_col].value == val;;
-                })}
-                usecase_col={props.usecase_col}
-                description_col={props.description_col}
-              >
-              </Vertical>)
-          )
-        }
-    </Box>
-  )
-};
-
-
-export function Vertical(props) {
-  console.log(props)
-  return (
-    <Box
-      m='medium'
-      border="1px solid black"
-      borderRadius="4px"
-      width='40%'
-      padding='10'
-      marginLeft={'auto'}
-      marginRight={'auto'}
-      >
-    <Heading fontSize='xlarge' fontWeight='bold' textAlign='center'>{props.vertical}</Heading>
-    <Box>
+    <Box display={'flex'} flexWrap={"wrap"}>
       {
           props.data.map((val, i) => 
-            (<UseCase 
-                key={i}
-                index={i+1}
-                usecase_name={val[props.usecase_col].value}
-                description={val[props.description_col].value}
-              >
-              </UseCase>)
+            <Tile 
+              key={i}
+              tag={val[props.tag_col].value}
+              name={props.name_col ? val[props.name_col].value: null}
+              description={props.description_col ? val[props.description_col].value : null}
+              colorList={props.colorList}
+              buttons={props.buttons ? props.buttons.map(function(button,i){
+                return {'name': button.name, 'link': val[button.column].value, 'icon': button.icon}}) : null}
+            />
           )
         }
     </Box>
-    </Box>
   )
 };
+
+
 
 
