@@ -1,6 +1,13 @@
 import React, { useEffect } from 'react'
 import { Paragraph, Heading, Box, ButtonOutline, ComponentsProvider } from '@looker/components';
 import styled, { ThemeProvider } from 'styled-components'
+import WebFont from 'webfontloader';
+
+WebFont.load({
+  google: {
+    families: ['Open Sans']
+  }
+});
 
 const InnerBox = styled(Box)`
     box-shadow: 4px 5px 2px #ECECEC;
@@ -8,6 +15,9 @@ const InnerBox = styled(Box)`
 
 const ButtonBox =  styled(Box)`
     vertical-align: bottom;`
+
+const MyButtonOutline =  styled(ButtonOutline)`
+    target: _blank;`
 
 // Create (or import) our react component
 export default function Tile (props) {
@@ -39,6 +49,8 @@ export default function Tile (props) {
     }
   }, [props.buttons]);
 
+
+
   console.log(props.buttons)
   return(
       <InnerBox
@@ -60,7 +72,7 @@ export default function Tile (props) {
           {
             buttons.map((button, i) => 
               button.link ?
-              <ButtonOutline key={i} color="neutral" size="small" iconBefore={button.icon} marginRight={"10px"} marginBottom={"10px"} href={button.link} target={"_blank"}>
+              <ButtonOutline key={i} color="neutral" size="small" iconBefore={button.icon} marginRight={"10px"} marginBottom={"10px"} onClick={() => LookerCharts.Utils.openUrl(button.link)}>
                 {button.name}
               </ButtonOutline>
               :
