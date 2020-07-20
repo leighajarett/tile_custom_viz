@@ -49,7 +49,10 @@ export default function Tile (props) {
     }
   }, [props.buttons]);
 
-
+  function handleClick(e, link){
+    LookerCharts.Utils.openUrl(link, event, false, {linkType: 'url'})
+    //LookerCharts.Utils.openDrillMenu({event, links: [{ label: 'hi', type: 'url', url: 'https://google.com' }]})
+  }
 
   console.log(props.buttons)
   return(
@@ -72,11 +75,11 @@ export default function Tile (props) {
           {
             buttons.map((button, i) => 
               button.link ?
-              <ButtonOutline key={i} color="neutral" size="small" iconBefore={button.icon} marginRight={"10px"} marginBottom={"10px"} onClick={() => LookerCharts.Utils.openUrl(button.link)}>
+              <ButtonOutline key={i} color="neutral" size="small" iconBefore={button.icon} marginRight={"10px"} marginBottom={"10px"} onClick={(e) => handleClick(e,button.link)}>
                 {button.name}
               </ButtonOutline>
               :
-              <Paragraph></Paragraph>
+              <></>
             )
           }   
         </ComponentsProvider>

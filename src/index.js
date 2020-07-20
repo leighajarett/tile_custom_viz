@@ -43,6 +43,13 @@ looker.plugins.visualizations.add({
           default: '',
           placeholder: 'The display name for the buttons'
         },
+        is_looker:{
+          label: 'Are these Looker links?',
+          type: 'string',
+          default: 'no',
+          display: 'select',
+          values: [{'Yes': 'yes'}, {'No': 'no'}]
+        },
         icon: {
           label: 'Icon Name',
           type: 'string',
@@ -65,7 +72,6 @@ looker.plugins.visualizations.add({
 
   // Set up the initial state of the visualizationval[props.vertical_col].value
   create: function(element, config) {
-
     element.innerHTML = `
       <style>
         .usecase-vis {
